@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Hardware Problem Report - PT. Mitra Integrasi Informatika</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --info-color: #0dcaf0;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo-container img {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
+        
+        .sidebar {
+            height: 100vh;
+            background-color: #343a40;
+            color: white;
+            padding-top: 20px;
+            position: fixed;
+            width: 250px;
+            z-index: 1000;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            border-radius: 0;
+        }
+        
+        .sidebar .nav-link:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar .nav-link.active {
+            color: white;
+            background-color: var(--primary-color);
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+        
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        .welcome-banner {
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .table {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .table thead {
+            background-color: #f8f9fa;
+        }
+        
+        .status-completed {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+        
+        .status-inprogress {
+            color: var(--info-color);
+            font-weight: 600;
+        }
+        
+        .status-waiting-customer {
+            color: var(--warning-color);
+            font-weight: 600;
+        }
+        
+        .status-waiting-schedule {
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 2000;
+            display: none;
+            max-width: 300px;
+        }
+        
+        .notification.show {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        
+        .btn-action {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            margin-right: 5px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <div class="d-flex align-items-center">
+            <div id="notification-icon"></div>
+            <div class="ms-2">
+                <div id="notification-title" class="fw-bold"></div>
+                <div id="notification-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login/Register Container -->
+    <div id="auth-container" class="login-container">
+        <div class="logo-container">
+            <img src="https://mii-hss.static.domains/MII.png">
+            <h3>Customer Hardware Problem Report</h3>
+        </div>
+        
+        <!-- Login Form -->
+        <div id="login-form">
+            <h4 class="mb-4">Login</h4>
+            <div class="mb-3">
+                <label for="login-username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="login-username" required>
+            </div>
+            <div class="mb-3">
+                <label for="login-password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="login-password" required>
+            </div>
+            <div class="d-grid gap-2">
+                <button type="button" class="btn btn-primary" onclick="login()">Login</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="showRegisterForm()">Register</button>
+            </div>
+        </div>
+        
+        <!-- Register Form -->
+        <div id="register-form" class="hidden">
+            <h4 class="mb-4">Register</h4>
+            <div class="mb-3">
+                <label for="register-username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="register-username" required>
+            </div>
+            <div class="mb-3">
+                <label for="register-password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="register-password" required>
+            </div>
+            <div class="mb-3">
+                <label for="register-confirm-password" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="register-confirm-password" required>
+            </div>
+            <div class="d-grid gap-2">
+                <button type="button" class="btn btn-primary" onclick="register()">Register</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="showLoginForm()">Back to Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="hidden">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="px-3 mb-4">
+                <h5>PT. MII</h5>
+                <small>Hardware Problem Report</small>
+            </div>
+            
+            <ul class="nav flex-column">
+                <!-- Admin Menu -->
+                <li id="admin-home-menu" class="nav-item hidden">
+                    <a class="nav-link active" href="#" onclick="showPage('home')">
+                        <i class="bi bi-house-door"></i> Home
+                    </a>
+                </li>
+                <li id="admin-export-menu" class="nav-item hidden">
+                    <a class="nav-link" href="#" onclick="showPage('export')">
+                        <i class="bi bi-file-earmark-arrow-down"></i> Save to PDF or Excel
+                    </a>
+                </li>
+                <li id="admin-users-menu" class="nav-item hidden">
+                    <a class="nav-link" href="#" onclick="showPage('users')">
+                        <i class="bi bi-people"></i> List User
+                    </a>
+                </li>
+                <li id="admin-change-password-menu" class="nav-item hidden">
+                    <a class="nav-link" href="#" onclick="showPage('change-password-admin')">
+                        <i class="bi bi-key"></i> Change Password Admin
+                    </a>
+                </li>
+                <li id="admin-reports-menu" class="nav-item hidden">
+                    <a class="nav-link" href="#" onclick="showPage('reports')">
+                        <i class="bi bi-list-check"></i> List All Report User
+                    </a>
+                </li>
+                
+                <!-- User Menu -->
+                <li id="user-home-menu" class="nav-item hidden">
+                    <a class="nav-link active" href="#" onclick="showPage('home')">
+                        <i class="bi bi-house-door"></i> Home
+                    </a>
+                </li>
+                <li id="user-input-menu" class="nav-item hidden">
+                    <a class="nav-link" href="#" onclick="showPage('input')">
+                        <i class="bi bi-plus-circle"></i> Input
+                    </a>
+                </li>
+                <li id="user-export-pdf-menu" class="nav-item hidden">
+                    <a class="nav-link" href="#" onclick="exportToPDF()">
+                        <i class="bi bi-file-earmark-pdf"></i> Save to PDF
+                    </a>
+                </li>
+                <li id="user-export-excel-menu" class="nav-item hidden">
+                    <a class="nav-link" href="#" onclick="exportToExcel()">
+                        <i class="bi bi-file-earmark-excel"></i> Save to Excel
+                    </a>
+                </li>
+                <li id="user-change-password-menu" class="nav-item hidden">
+                    <a class="nav-link" href="#" onclick="showPage('change-password-user')">
+                        <i class="bi bi-key"></i> Change Password User
+                    </a>
+                </li>
+                <li id="user-reports-menu" class="nav-item hidden">
+                    <a class="nav-link" href="#" onclick="showPage('reports')">
+                        <i class="bi bi-list-check"></i> List All Report User
+                    </a>
+                </li>
+                
+                <!-- Common Menu -->
+                <li class="nav-item mt-auto">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+                <h4 id="welcome-message">Welcome</h4>
+            </div>
+
+            <!-- Home Page -->
+            <div id="home-page" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Dashboard</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-4">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title" id="total-reports">0</h5>
+                                        <p class="card-text">Total Reports</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-4">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-success" id="completed-reports">0</h5>
+                                        <p class="card-text">Completed</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-4">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-info" id="inprogress-reports">0</h5>
+                                        <p class="card-text">In Progress</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-4">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-warning" id="waiting-reports">0</h5>
+                                        <p class="card-text">Waiting</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h5>Recent Reports</h5>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Customer</th>
+                                            <th>Brand</th>
+                                            <th>Type</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-reports-tbody">
+                                        <!-- Recent reports will be inserted here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Page -->
+            <div id="input-page" class="page hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Input Hardware Problem Report</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="input-form">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="customer" class="form-label">Customer</label>
+                                    <input type="text" class="form-control" id="customer" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="address" class="form-label">Address</label>
+                                    <input type="text" class="form-control" id="address" required>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="problem-description" class="form-label">Problem Description</label>
+                                <textarea class="form-control" id="problem-description" rows="3" required></textarea>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="serial-number" class="form-label">Serial Number</label>
+                                    <input type="text" class="form-control" id="serial-number" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="brand" class="form-label">Brand</label>
+                                    <select class="form-select" id="brand" required>
+                                        <option value="">Select Brand</option>
+                                        <option value="HPE">HPE</option>
+                                        <option value="Dell">Dell</option>
+                                        <option value="Lenovo">Lenovo</option>
+                                        <option value="Huawei">Huawei</option>
+                                        <option value="Hitachi">Hitachi</option>
+                                        <option value="Cisco">Cisco</option>
+                                        <option value="Others">Others</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="type-hardware" class="form-label">Type Hardware</label>
+                                    <select class="form-select" id="type-hardware" required>
+                                        <option value="">Select Type</option>
+                                        <option value="Server">Server</option>
+                                        <option value="Storage">Storage</option>
+                                        <option value="SAN Switch">SAN Switch</option>
+                                        <option value="Tape Backup">Tape Backup</option>
+                                        <option value="Others">Others</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="idcase-mcare" class="form-label">IDCase/MCare Number</label>
+                                    <input type="text" class="form-control" id="idcase-mcare" required>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="start-date" class="form-label">Start Date</label>
+                                    <input type="date" class="form-control" id="start-date" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="status" class="form-label">Status</label>
+                                    <select class="form-select" id="status" required>
+                                        <option value="">Select Status</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="inprogress">In Progress</option>
+                                        <option value="waiting customer">Waiting Customer</option>
+                                        <option value="waiting schedule">Waiting Schedule</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Page -->
+            <div id="export-page" class="page hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Export Data</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i class="bi bi-file-earmark-pdf" style="font-size: 3rem; color: #dc3545;"></i>
+                                        <h5 class="card-title mt-3">Export to PDF</h5>
+                                        <p class="card-text">Download all reports in PDF format</p>
+                                        <button class="btn btn-danger" onclick="exportToPDF()">Export PDF</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i class="bi bi-file-earmark-excel" style="font-size: 3rem; color: #198754;"></i>
+                                        <h5 class="card-title mt-3">Export to Excel</h5>
+                                        <p class="card-text">Download all reports in Excel format</p>
+                                        <button class="btn btn-success" onclick="exportToExcel()">Export Excel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Page -->
+            <div id="users-page" class="page hidden">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">List User</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Role</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-tbody">
+                                    <!-- Users will be inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Change Password Admin Page -->
+            <div id="change-password-admin-page" class="page hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Change Admin Password</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="change-password-admin-form">
+                            <div class="mb-3">
+                                <label for="current-admin-password" class="form-label">Current Password</label>
+                                <input type="password" class="form-control" id="current-admin-password" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="new-admin-password" class="form-label">New Password</label>
+                                <input type="password" class="form-control" id="new-admin-password" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirm-new-admin-password" class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-control" id="confirm-new-admin-password" required>
+                            </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="submit" class="btn btn-primary">Change Password</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Change Password User Page -->
+            <div id="change-password-user-page" class="page hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Change User Password</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="change-password-user-form">
+                            <div class="mb-3">
+                                <label for="current-user-password" class="form-label">Current Password</label>
+                                <input type="password" class="form-control" id="current-user-password" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="new-user-password" class="form-label">New Password</label>
+                                <input type="password" class="form-control" id="new-user-password" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirm-new-user-password" class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-control" id="confirm-new-user-password" required>
+                            </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="submit" class="btn btn-primary">Change Password</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Page -->
+            <div id="reports-page" class="page hidden">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">List All Report User</h5>
+                        <div>
+                            <input type="text" class="form-control" id="search-reports" placeholder="Search reports...">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Customer</th>
+                                        <th>Address</th>
+                                        <th>Problem</th>
+                                        <th>Serial Number</th>
+                                        <th>Brand</th>
+                                        <th>Type</th>
+                                        <th>IDCase/MCare</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reports-tbody">
+                                    <!-- Reports will be inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Report Modal -->
+    <div class="modal fade" id="editReportModal" tabindex="-1" aria-labelledby="editReportModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editReportModalLabel">Edit Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-report-form">
+                        <input type="hidden" id="edit-report-id">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-customer" class="form-label">Customer</label>
+                                <input type="text" class="form-control" id="edit-customer" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-address" class="form-label">Address</label>
+                                <input type="text" class="form-control" id="edit-address" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="edit-problem-description" class="form-label">Problem Description</label>
+                            <textarea class="form-control" id="edit-problem-description" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-serial-number" class="form-label">Serial Number</label>
+                                <input type="text" class="form-control" id="edit-serial-number" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-brand" class="form-label">Brand</label>
+                                <select class="form-select" id="edit-brand" required>
+                                    <option value="">Select Brand</option>
+                                    <option value="HPE">HPE</option>
+                                    <option value="Dell">Dell</option>
+                                    <option value="Lenovo">Lenovo</option>
+                                    <option value="Huawei">Huawei</option>
+                                    <option value="Hitachi">Hitachi</option>
+                                    <option value="Cisco">Cisco</option>
+                                    <option value="Others">Others</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-type-hardware" class="form-label">Type Hardware</label>
+                                <select class="form-select" id="edit-type-hardware" required>
+                                    <option value="">Select Type</option>
+                                    <option value="Server">Server</option>
+                                    <option value="Storage">Storage</option>
+                                    <option value="SAN Switch">SAN Switch</option>
+                                    <option value="Tape Backup">Tape Backup</option>
+                                    <option value="Others">Others</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-idcase-mcare" class="form-label">IDCase/MCare Number</label>
+                                <input type="text" class="form-control" id="edit-idcase-mcare" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-start-date" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="edit-start-date" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-status" class="form-label">Status</label>
+                                <select class="form-select" id="edit-status" required>
+                                    <option value="">Select Status</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="inprogress">In Progress</option>
+                                    <option value="waiting customer">Waiting Customer</option>
+                                    <option value="waiting schedule">Waiting Schedule</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveEditedReport()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Password Modal -->
+    <div class="modal fade" id="editUserPasswordModal" tabindex="-1" aria-labelledby="editUserPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUserPasswordModalLabel">Edit User Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-user-password-form">
+                        <input type="hidden" id="edit-user-username">
+                        <div class="mb-3">
+                            <label for="edit-user-new-password" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="edit-user-new-password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-user-confirm-password" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="edit-user-confirm-password" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveEditedUserPassword()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize data
+        let currentUser = null;
+        let reports = [];
+        let users = [];
+        
+        // Check if localStorage has data
+        if (localStorage.getItem('reports')) {
+            reports = JSON.parse(localStorage.getItem('reports'));
+        } else {
+            // Initialize with sample data
+            reports = [
+                {
+                    id: 1,
+                    customer: "PT. ABC",
+                    address: "Jakarta",
+                    problemDescription: "Server tidak bisa booting",
+                    serialNumber: "SN12345",
+                    brand: "HPE",
+                    typeHardware: "Server",
+                    idcaseMcare: "CASE001",
+                    startDate: "2023-05-01",
+                    status: "completed",
+                    createdBy: "admin"
+                },
+                {
+                    id: 2,
+                    customer: "PT. XYZ",
+                    address: "Surabaya",
+                    problemDescription: "Storage full",
+                    serialNumber: "SN67890",
+                    brand: "Dell",
+                    typeHardware: "Storage",
+                    idcaseMcare: "CASE002",
+                    startDate: "2023-05-10",
+                    status: "inprogress",
+                    createdBy: "user1"
+                }
+            ];
+            localStorage.setItem('reports', JSON.stringify(reports));
+        }
+        
+        if (localStorage.getItem('users')) {
+            users = JSON.parse(localStorage.getItem('users'));
+        } else {
+            // Initialize with admin user
+            users = [
+                {
+                    username: "admin",
+                    password: "admin123",
+                    role: "admin"
+                }
+            ];
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+        
+        // Check if user is already logged in
+        if (sessionStorage.getItem('currentUser')) {
+            currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            showDashboard();
+        }
+        
+        // Show/Hide forms
+        function showLoginForm() {
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('register-form').classList.add('hidden');
+        }
+        
+        function showRegisterForm() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.remove('hidden');
+        }
+        
+        // Login function
+        function login() {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!username || !password) {
+                showNotification('error', 'Login Failed', 'Please enter username and password');
+                return;
+            }
+            
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                showDashboard();
+                showNotification('success', 'Login Successful', `Welcome back, ${username}!`);
+            } else {
+                showNotification('error', 'Login Failed', 'Invalid username or password');
+            }
+        }
+        
+        // Register function
+        function register() {
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            
+            if (!username || !password || !confirmPassword) {
+                showNotification('error', 'Registration Failed', 'Please fill all fields');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showNotification('error', 'Registration Failed', 'Passwords do not match');
+                return;
+            }
+            
+            if (users.find(u => u.username === username)) {
+                showNotification('error', 'Registration Failed', 'Username already exists');
+                return;
+            }
+            
+            users.push({
+                username: username,
+                password: password,
+                role: "user"
+            });
+            
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            showNotification('success', 'Registration Successful', 'Account created successfully');
+            showLoginForm();
+            
+            // Clear form
+            document.getElementById('register-username').value = '';
+            document.getElementById('register-password').value = '';
+            document.getElementById('register-confirm-password').value = '';
+        }
+        
+        // Show dashboard
+        function showDashboard() {
+            document.getElementById('auth-container').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            
+            // Set welcome message
+            if (currentUser.role === 'admin') {
+                document.getElementById('welcome-message').textContent = 'Welcome Administrator';
+                
+                // Show admin menu
+                document.getElementById('admin-home-menu').classList.remove('hidden');
+                document.getElementById('admin-export-menu').classList.remove('hidden');
+                document.getElementById('admin-users-menu').classList.remove('hidden');
+                document.getElementById('admin-change-password-menu').classList.remove('hidden');
+                document.getElementById('admin-reports-menu').classList.remove('hidden');
+                
+                // Hide user menu
+                document.getElementById('user-home-menu').classList.add('hidden');
+                document.getElementById('user-input-menu').classList.add('hidden');
+                document.getElementById('user-export-pdf-menu').classList.add('hidden');
+                document.getElementById('user-export-excel-menu').classList.add('hidden');
+                document.getElementById('user-change-password-menu').classList.add('hidden');
+                document.getElementById('user-reports-menu').classList.add('hidden');
+            } else {
+                document.getElementById('welcome-message').textContent = `Welcome ${currentUser.username}`;
+                
+                // Show user menu
+                document.getElementById('user-home-menu').classList.remove('hidden');
+                document.getElementById('user-input-menu').classList.remove('hidden');
+                document.getElementById('user-export-pdf-menu').classList.remove('hidden');
+                document.getElementById('user-export-excel-menu').classList.remove('hidden');
+                document.getElementById('user-change-password-menu').classList.remove('hidden');
+                document.getElementById('user-reports-menu').classList.remove('hidden');
+                
+                // Hide admin menu
+                document.getElementById('admin-home-menu').classList.add('hidden');
+                document.getElementById('admin-export-menu').classList.add('hidden');
+                document.getElementById('admin-users-menu').classList.add('hidden');
+                document.getElementById('admin-change-password-menu').classList.add('hidden');
+                document.getElementById('admin-reports-menu').classList.add('hidden');
+            }
+            
+            // Show home page
+            showPage('home');
+            
+            // Check for old reports and send notifications
+            checkOldReports();
+        }
+        
+        // Logout function
+        function logout() {
+            currentUser = null;
+            sessionStorage.removeItem('currentUser');
+            document.getElementById('auth-container').classList.remove('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+            
+            // Clear login form
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+            
+            showNotification('info', 'Logged Out', 'You have been logged out successfully');
+        }
+        
+        // Show page
+        function showPage(pageName) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            // Show selected page
+            document.getElementById(`${pageName}-page`).classList.remove('hidden');
+            
+            // Update active menu
+            const menuItems = document.querySelectorAll('.nav-link');
+            menuItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Set active menu based on page
+            if (pageName === 'home') {
+                if (currentUser.role === 'admin') {
+                    document.querySelector('#admin-home-menu .nav-link').classList.add('active');
+                } else {
+                    document.querySelector('#user-home-menu .nav-link').classList.add('active');
+                }
+                
+                // Update dashboard stats
+                updateDashboardStats();
+                loadRecentReports();
+            } else if (pageName === 'input') {
+                document.querySelector('#user-input-menu .nav-link').classList.add('active');
+                resetForm();
+            } else if (pageName === 'export') {
+                document.querySelector('#admin-export-menu .nav-link').classList.add('active');
+            } else if (pageName === 'users') {
+                document.querySelector('#admin-users-menu .nav-link').classList.add('active');
+                loadUsers();
+            } else if (pageName === 'change-password-admin') {
+                document.querySelector('#admin-change-password-menu .nav-link').classList.add('active');
+            } else if (pageName === 'change-password-user') {
+                document.querySelector('#user-change-password-menu .nav-link').classList.add('active');
+            } else if (pageName === 'reports') {
+                if (currentUser.role === 'admin') {
+                    document.querySelector('#admin-reports-menu .nav-link').classList.add('active');
+                } else {
+                    document.querySelector('#user-reports-menu .nav-link').classList.add('active');
+                }
+                loadReports();
+            }
+        }
+        
+        // Update dashboard stats
+        function updateDashboardStats() {
+            const totalReports = reports.length;
+            const completedReports = reports.filter(r => r.status === 'completed').length;
+            const inprogressReports = reports.filter(r => r.status === 'inprogress').length;
+            const waitingReports = reports.filter(r => r.status === 'waiting customer' || r.status === 'waiting schedule').length;
+            
+            document.getElementById('total-reports').textContent = totalReports;
+            document.getElementById('completed-reports').textContent = completedReports;
+            document.getElementById('inprogress-reports').textContent = inprogressReports;
+            document.getElementById('waiting-reports').textContent = waitingReports;
+        }
+        
+        // Load recent reports
+        function loadRecentReports() {
+            const tbody = document.getElementById('recent-reports-tbody');
+            tbody.innerHTML = '';
+            
+            // Sort reports by date (newest first)
+            const sortedReports = [...reports].sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+            
+            // Get top 5 recent reports
+            const recentReports = sortedReports.slice(0, 5);
+            
+            recentReports.forEach(report => {
+                const row = document.createElement('tr');
+                
+                let statusClass = '';
+                if (report.status === 'completed') {
+                    statusClass = 'status-completed';
+                } else if (report.status === 'inprogress') {
+                    statusClass = 'status-inprogress';
+                } else if (report.status === 'waiting customer') {
+                    statusClass = 'status-waiting-customer';
+                } else if (report.status === 'waiting schedule') {
+                    statusClass = 'status-waiting-schedule';
+                }
+                
+                row.innerHTML = `
+                    <td>${report.id}</td>
+                    <td>${report.customer}</td>
+                    <td>${report.brand}</td>
+                    <td>${report.typeHardware}</td>
+                    <td class="${statusClass}">${report.status}</td>
+                    <td>${report.startDate}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Reset form
+        function resetForm() {
+            document.getElementById('input-form').reset();
+        }
+        
+        // Submit report form
+        document.getElementById('input-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newReport = {
+                id: reports.length > 0 ? Math.max(...reports.map(r => r.id)) + 1 : 1,
+                customer: document.getElementById('customer').value,
+                address: document.getElementById('address').value,
+                problemDescription: document.getElementById('problem-description').value,
+                serialNumber: document.getElementById('serial-number').value,
+                brand: document.getElementById('brand').value,
+                typeHardware: document.getElementById('type-hardware').value,
+                idcaseMcare: document.getElementById('idcase-mcare').value,
+                startDate: document.getElementById('start-date').value,
+                status: document.getElementById('status').value,
+                createdBy: currentUser.username
+            };
+            
+            reports.push(newReport);
+            localStorage.setItem('reports', JSON.stringify(reports));
+            
+            showNotification('success', 'Report Added', 'Hardware problem report has been added successfully');
+            resetForm();
+            
+            // If on reports page, refresh the list
+            if (!document.getElementById('reports-page').classList.contains('hidden')) {
+                loadReports();
+            }
+        });
+        
+        // Load reports
+        function loadReports() {
+            const tbody = document.getElementById('reports-tbody');
+            tbody.innerHTML = '';
+            
+            // Filter reports based on user role
+            let filteredReports = reports;
+            if (currentUser.role === 'user') {
+                filteredReports = reports.filter(r => r.createdBy === currentUser.username);
+            }
+            
+            // Sort reports by date (newest first)
+            const sortedReports = [...filteredReports].sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+            
+            sortedReports.forEach(report => {
+                const row = document.createElement('tr');
+                
+                let statusClass = '';
+                if (report.status === 'completed') {
+                    statusClass = 'status-completed';
+                } else if (report.status === 'inprogress') {
+                    statusClass = 'status-inprogress';
+                } else if (report.status === 'waiting customer') {
+                    statusClass = 'status-waiting-customer';
+                } else if (report.status === 'waiting schedule') {
+                    statusClass = 'status-waiting-schedule';
+                }
+                
+                row.innerHTML = `
+                    <td>${report.id}</td>
+                    <td>${report.customer}</td>
+                    <td>${report.address}</td>
+                    <td>${report.problemDescription}</td>
+                    <td>${report.serialNumber}</td>
+                    <td>${report.brand}</td>
+                    <td>${report.typeHardware}</td>
+                    <td>${report.idcaseMcare}</td>
+                    <td>${report.startDate}</td>
+                    <td class="${statusClass}">${report.status}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary btn-action" onclick="editReport(${report.id})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger btn-action" onclick="deleteReport(${report.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Edit report
+        function editReport(id) {
+            const report = reports.find(r => r.id === id);
+            
+            if (report) {
+                document.getElementById('edit-report-id').value = report.id;
+                document.getElementById('edit-customer').value = report.customer;
+                document.getElementById('edit-address').value = report.address;
+                document.getElementById('edit-problem-description').value = report.problemDescription;
+                document.getElementById('edit-serial-number').value = report.serialNumber;
+                document.getElementById('edit-brand').value = report.brand;
+                document.getElementById('edit-type-hardware').value = report.typeHardware;
+                document.getElementById('edit-idcase-mcare').value = report.idcaseMcare;
+                document.getElementById('edit-start-date').value = report.startDate;
+                document.getElementById('edit-status').value = report.status;
+                
+                const modal = new bootstrap.Modal(document.getElementById('editReportModal'));
+                modal.show();
+            }
+        }
+        
+        // Save edited report
+        function saveEditedReport() {
+            const id = parseInt(document.getElementById('edit-report-id').value);
+            const reportIndex = reports.findIndex(r => r.id === id);
+            
+            if (reportIndex !== -1) {
+                reports[reportIndex] = {
+                    id: id,
+                    customer: document.getElementById('edit-customer').value,
+                    address: document.getElementById('edit-address').value,
+                    problemDescription: document.getElementById('edit-problem-description').value,
+                    serialNumber: document.getElementById('edit-serial-number').value,
+                    brand: document.getElementById('edit-brand').value,
+                    typeHardware: document.getElementById('edit-type-hardware').value,
+                    idcaseMcare: document.getElementById('edit-idcase-mcare').value,
+                    startDate: document.getElementById('edit-start-date').value,
+                    status: document.getElementById('edit-status').value,
+                    createdBy: reports[reportIndex].createdBy
+                };
+                
+                localStorage.setItem('reports', JSON.stringify(reports));
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editReportModal'));
+                modal.hide();
+                
+                showNotification('success', 'Report Updated', 'Hardware problem report has been updated successfully');
+                
+                // Refresh reports list
+                loadReports();
+            }
+        }
+        
+        // Delete report
+        function deleteReport(id) {
+            if (confirm('Are you sure you want to delete this report?')) {
+                reports = reports.filter(r => r.id !== id);
+                localStorage.setItem('reports', JSON.stringify(reports));
+                
+                showNotification('success', 'Report Deleted', 'Hardware problem report has been deleted successfully');
+                
+                // Refresh reports list
+                loadReports();
+            }
+        }
+        
+        // Load users
+        function loadUsers() {
+            const tbody = document.getElementById('users-tbody');
+            tbody.innerHTML = '';
+            
+            users.forEach(user => {
+                if (user.role === 'user') {  // Only show regular users, not admin
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${user.username}</td>
+                        <td>${user.role}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary btn-action" onclick="editUserPassword('${user.username}')">
+                                <i class="bi bi-key"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger btn-action" onclick="deleteUser('${user.username}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                }
+            });
+        }
+        
+        // Edit user password
+        function editUserPassword(username) {
+            document.getElementById('edit-user-username').value = username;
+            document.getElementById('edit-user-new-password').value = '';
+            document.getElementById('edit-user-confirm-password').value = '';
+            
+            const modal = new bootstrap.Modal(document.getElementById('editUserPasswordModal'));
+            modal.show();
+        }
+        
+        // Save edited user password
+        function saveEditedUserPassword() {
+            const username = document.getElementById('edit-user-username').value;
+            const newPassword = document.getElementById('edit-user-new-password').value;
+            const confirmPassword = document.getElementById('edit-user-confirm-password').value;
+            
+            if (!newPassword || !confirmPassword) {
+                showNotification('error', 'Update Failed', 'Please fill all fields');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showNotification('error', 'Update Failed', 'Passwords do not match');
+                return;
+            }
+            
+            const userIndex = users.findIndex(u => u.username === username);
+            
+            if (userIndex !== -1) {
+                users[userIndex].password = newPassword;
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editUserPasswordModal'));
+                modal.hide();
+                
+                showNotification('success', 'Password Updated', 'User password has been updated successfully');
+            }
+        }
+        
+        // Delete user
+        function deleteUser(username) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                users = users.filter(u => u.username !== username);
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                showNotification('success', 'User Deleted', 'User has been deleted successfully');
+                
+                // Refresh users list
+                loadUsers();
+            }
+        }
+        
+        // Change admin password
+        document.getElementById('change-password-admin-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('current-admin-password').value;
+            const newPassword = document.getElementById('new-admin-password').value;
+            const confirmPassword = document.getElementById('confirm-new-admin-password').value;
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showNotification('error', 'Update Failed', 'Please fill all fields');
+                return;
+            }
+            
+            if (currentPassword !== currentUser.password) {
+                showNotification('error', 'Update Failed', 'Current password is incorrect');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showNotification('error', 'Update Failed', 'New passwords do not match');
+                return;
+            }
+            
+            const userIndex = users.findIndex(u => u.username === currentUser.username);
+            
+            if (userIndex !== -1) {
+                users[userIndex].password = newPassword;
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                // Update current user
+                currentUser.password = newPassword;
+                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                // Clear form
+                document.getElementById('current-admin-password').value = '';
+                document.getElementById('new-admin-password').value = '';
+                document.getElementById('confirm-new-admin-password').value = '';
+                
+                showNotification('success', 'Password Updated', 'Admin password has been updated successfully');
+            }
+        });
+        
+        // Change user password
+        document.getElementById('change-password-user-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('current-user-password').value;
+            const newPassword = document.getElementById('new-user-password').value;
+            const confirmPassword = document.getElementById('confirm-new-user-password').value;
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showNotification('error', 'Update Failed', 'Please fill all fields');
+                return;
+            }
+            
+            if (currentPassword !== currentUser.password) {
+                showNotification('error', 'Update Failed', 'Current password is incorrect');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showNotification('error', 'Update Failed', 'New passwords do not match');
+                return;
+            }
+            
+            const userIndex = users.findIndex(u => u.username === currentUser.username);
+            
+            if (userIndex !== -1) {
+                users[userIndex].password = newPassword;
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                // Update current user
+                currentUser.password = newPassword;
+                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                // Clear form
+                document.getElementById('current-user-password').value = '';
+                document.getElementById('new-user-password').value = '';
+                document.getElementById('confirm-new-user-password').value = '';
+                
+                showNotification('success', 'Password Updated', 'Your password has been updated successfully');
+            }
+        });
+        
+        // Export to PDF (simulated)
+        function exportToPDF() {
+            showNotification('info', 'Exporting to PDF', 'Preparing PDF export...');
+            
+            // Simulate export process
+            setTimeout(() => {
+                showNotification('success', 'Export Successful', 'Reports have been exported to PDF successfully');
+                
+                // In a real application, this would generate and download a PDF file
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reports));
+                const downloadAnchorNode = document.createElement('a');
+                downloadAnchorNode.setAttribute("href", dataStr);
+                downloadAnchorNode.setAttribute("download", "hardware_problem_reports.pdf");
+                document.body.appendChild(downloadAnchorNode);
+                downloadAnchorNode.click();
+                downloadAnchorNode.remove();
+            }, 1500);
+        }
+        
+        // Export to Excel (simulated)
+        function exportToExcel() {
+            showNotification('info', 'Exporting to Excel', 'Preparing Excel export...');
+            
+            // Simulate export process
+            setTimeout(() => {
+                showNotification('success', 'Export Successful', 'Reports have been exported to Excel successfully');
+                
+                // In a real application, this would generate and download an Excel file
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reports));
+                const downloadAnchorNode = document.createElement('a');
+                downloadAnchorNode.setAttribute("href", dataStr);
+                downloadAnchorNode.setAttribute("download", "hardware_problem_reports.xlsx");
+                document.body.appendChild(downloadAnchorNode);
+                downloadAnchorNode.click();
+                downloadAnchorNode.remove();
+            }, 1500);
+        }
+        
+        // Show notification
+        function showNotification(type, title, message) {
+            const notification = document.getElementById('notification');
+            const notificationIcon = document.getElementById('notification-icon');
+            const notificationTitle = document.getElementById('notification-title');
+            const notificationMessage = document.getElementById('notification-message');
+            
+            // Set icon based on type
+            if (type === 'success') {
+                notificationIcon.innerHTML = '<i class="bi bi-check-circle-fill text-success" style="font-size: 1.5rem;"></i>';
+            } else if (type === 'error') {
+                notificationIcon.innerHTML = '<i class="bi bi-x-circle-fill text-danger" style="font-size: 1.5rem;"></i>';
+            } else if (type === 'info') {
+                notificationIcon.innerHTML = '<i class="bi bi-info-circle-fill text-info" style="font-size: 1.5rem;"></i>';
+            }
+            
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            
+            notification.classList.add('show');
+            
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Check for old reports and send notifications
+        function checkOldReports() {
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            
+            const oldReports = reports.filter(report => {
+                const reportDate = new Date(report.startDate);
+                return reportDate < oneWeekAgo && report.status !== 'completed';
+            });
+            
+            if (oldReports.length > 0) {
+                // In a real application, this would send an email
+                console.log(`Sending notification to hw.support@mii.co.id about ${oldReports.length} old reports`);
+                
+                // Show notification to admin
+                if (currentUser.role === 'admin') {
+                    showNotification('warning', 'Old Reports Alert', `${oldReports.length} reports are older than 1 week and not completed. Notification sent to hw.support@mii.co.id`);
+                }
+            }
+        }
+        
+        // Search reports
+        document.getElementById('search-reports').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#reports-tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+        
+        // Set today's date as default for start date
+        document.getElementById('start-date').valueAsDate = new Date();
+    </script>
+</body>
+</html>
